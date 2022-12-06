@@ -13,6 +13,10 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.reactivestreams.client.ListDatabasesPublisher;
+import com.mongodb.reactivestreams.client.MongoCollection;
+import com.mongodb.reactivestreams.client.MongoDatabase;
+
 /**
  * Hello world!
  */
@@ -55,6 +59,9 @@ public final class App {
         String idle_time_text = configuration.map.get("activity").get("idle_time").toString();
         Integer idle_time = Integer.parseInt(configuration.map.get("activity").get("idle_time").toString());
         Integer loops = Integer.parseInt(configuration.map.get("activity").get("loops").toString());
+        String activity_database =  configuration.map.get("activity").get("database").toString();
+        String activity_collection =  configuration.map.get("activity").get("collection").toString();
+
 
         System.setProperty("javax.net.ssl.trustStore",truststore_location);
         System.setProperty("javax.net.ssl.trustStorePassword", truststore_password);
@@ -62,11 +69,17 @@ public final class App {
         logger.info("Making connection");
 
         final Connection connection = new Connection(configuration);
+        ListDatabasesPublisher<Document> databases = connection.mongoClient.listDatabases();
 
         logger.info("Running activity loops");
 
+
         for (Integer i = 0; i < loops; i++) {
             String istring = i.toString();
+
+            databases.subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
+            MongoDatabase database = connection.mongoClient.getDatabase(activity_database);
+            database.listCollectionNames().subscribe(new SubscriberHelpers.PrintToStringSubscriber<String>());
             
             try {
                 logger.info("Sleeping for ["+idle_time_text+"] seconds...");
@@ -75,8 +88,7 @@ public final class App {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            List<Document> databases = connection.mongoClient.listDatabases().into(new ArrayList<>());
-            databases.forEach(db -> logger.info("Loop ["+istring+"] "+db.toJson()));
+            
 
         }
 

@@ -38,8 +38,8 @@
   <!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync -->
 <dependency>
     <groupId>org.mongodb</groupId>
-    <artifactId>mongodb-driver-sync</artifactId>
-    <version>4.1.0</version>
+    <artifactId>mongodb-driver-reactivestreams</artifactId>
+    <version>4.1.2</version>
 </dependency>
  <dependency>
 <groupId>org.slf4j</groupId>
