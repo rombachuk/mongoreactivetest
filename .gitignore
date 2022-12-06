@@ -6,3 +6,5 @@ mongoreactivetest.ini
 mongoreactivetest.log
 .DS_Store
 .vscode
+mongotest.log
+.gitignore
