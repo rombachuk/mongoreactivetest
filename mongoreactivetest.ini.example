@@ -16,3 +16,5 @@ password = <base64 encode your truststore password here>
 [activity]
 idle_time = 300
 loops = 10
+database = ibmclouddb
+collection = test
