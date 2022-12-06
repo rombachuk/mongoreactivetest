@@ -1,0 +1,8 @@
+keystore/
+target/
+keystore/e9d28a2a-c5c6-4baf-971a-ae0272a51966.crt
+mongoreactivetest.tgz
+mongoreactivetest.ini
+mongoreactivetest.log
+.DS_Store
+.vscode
