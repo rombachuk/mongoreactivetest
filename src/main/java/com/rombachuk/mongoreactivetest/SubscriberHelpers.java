@@ -45,10 +45,15 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *  Subscriber helper implementations for the Quick Tour.
  */
 public final class SubscriberHelpers {
+
+    private static Logger logger = LoggerFactory.getLogger(App.class.getName());
 
     /**
      * A Subscriber that stores the publishers results and provides a latch so can block on completion.
@@ -240,6 +245,18 @@ public final class SubscriberHelpers {
         }
     }
 
+       /**
+     * A Subscriber that logs the json version of each document
+     */
+    public static class LogDocumentSubscriber extends ConsumerSubscriber<Document> {
+        /**
+         * Construct a new instance
+         */
+        public LogDocumentSubscriber(String prefix) {
+            super(t -> logger.info(prefix+t.toJson()));
+        }
+    }
+
     /**
      * A Subscriber that prints the toString version of each element
      * @param <T> the type of the element
@@ -250,6 +267,19 @@ public final class SubscriberHelpers {
          */
         public PrintToStringSubscriber() {
             super(System.out::println);
+        }
+    }
+
+     /**
+     * A Subscriber that prints the toString version of each element
+     * @param <T> the type of the element
+     */
+    public static class LogToStringSubscriber<T> extends ConsumerSubscriber<T> {
+        /**
+         * Construct a new instance
+         */
+        public LogToStringSubscriber(String prefix) {
+            super(t -> logger.info(prefix+t.toString()));
         }
     }
 

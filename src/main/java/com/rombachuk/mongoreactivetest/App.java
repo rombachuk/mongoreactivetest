@@ -61,6 +61,8 @@ public final class App {
         Integer loops = Integer.parseInt(configuration.map.get("activity").get("loops").toString());
         String activity_database =  configuration.map.get("activity").get("database").toString();
         String activity_collection =  configuration.map.get("activity").get("collection").toString();
+        Integer publishers =  Integer.parseInt(configuration.map.get("activity").get("publishers").toString());
+        Integer subs_per_pub =  Integer.parseInt(configuration.map.get("activity").get("subscribers_per_publisher").toString());
 
 
         System.setProperty("javax.net.ssl.trustStore",truststore_location);
@@ -69,20 +71,43 @@ public final class App {
         logger.info("Making connection");
 
         final Connection connection = new Connection(configuration);
-        ListDatabasesPublisher<Document> databases = connection.mongoClient.listDatabases();
+        List<ListDatabasesPublisher<Document>> alldb_publishers = new ArrayList<ListDatabasesPublisher<Document>>();
+        List<MongoDatabase> allcoll_publishers = new ArrayList<MongoDatabase>();
+
+        for (Integer i = 0; i < publishers; i++) {
+            alldb_publishers.add(connection.mongoClient.listDatabases());
+            allcoll_publishers.add(connection.mongoClient.getDatabase(activity_database));
+        }
 
         logger.info("Running activity loops");
 
 
-        for (Integer i = 0; i < loops; i++) {
-            String istring = i.toString();
+        for (Integer i = 0; i < loops; i++) {          
 
-            databases.subscribe(new SubscriberHelpers.PrintDocumentSubscriber());
-            MongoDatabase database = connection.mongoClient.getDatabase(activity_database);
-            database.listCollectionNames().subscribe(new SubscriberHelpers.PrintToStringSubscriber<String>());
+            Integer pindex = 0;
+            for (ListDatabasesPublisher<Document> publisher : alldb_publishers) {
+                Integer sindex = 0;
+                for (Integer j=0; j < subs_per_pub; j++) {
+                String logprefix = "Loop ["+i.toString()+"] alldb Pubsub [" + pindex.toString() + "/"+ sindex.toString()+"] ";
+                publisher.subscribe(new SubscriberHelpers.LogDocumentSubscriber(logprefix)); 
+                sindex = sindex + 1;
+                }
+                pindex = pindex + 1;
+            }
+
+            pindex = 0;
+            for (MongoDatabase publisher : allcoll_publishers) {
+                Integer sindex = 0;
+                for (Integer j=0; j < subs_per_pub; j++) {
+                String logprefix = "Loop ["+i.toString()+"] allcoll Pubsub [" + pindex.toString() + "/"+ sindex.toString()+"] ";
+                publisher.listCollectionNames().subscribe(new SubscriberHelpers.LogToStringSubscriber<String>(logprefix)); 
+                sindex = sindex + 1;
+                }
+                pindex = pindex + 1;
+            }
             
             try {
-                logger.info("Sleeping for ["+idle_time_text+"] seconds...");
+                logger.info("Loop ["+i+"] Sleeping for ["+idle_time_text+"] seconds...");
                 TimeUnit.SECONDS.sleep(idle_time);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
