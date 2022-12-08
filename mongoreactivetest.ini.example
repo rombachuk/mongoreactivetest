@@ -1,20 +1,27 @@
 [credential]
 username = admin
-password = <base64 encode your mongo password here>
+password = < enter base64 password here >
 [target]
-server1hostport = <firsthost here>:<firstport here>
-server2hostport = <secondhost here>:<secondport here>
-server3hostport = <thirdhost here>:<thirdport here>
+server1hostport = e9d28a2a-c5c6-4baf-971a-ae0272a51966-0.bm49h38l0bihsg5ne8d0.databases.appdomain.cloud:30679
+server2hostport = e9d28a2a-c5c6-4baf-971a-ae0272a51966-1.bm49h38l0bihsg5ne8d0.databases.appdomain.cloud:30679
+server3hostport = e9d28a2a-c5c6-4baf-971a-ae0272a51966-2.bm49h38l0bihsg5ne8d0.databases.appdomain.cloud:30679
 database = ibmclouddb
 authsource = admin
 replicaset = replset
 [connectionpool]
-maxconnectionidletime = 180
+maxconnectionidletime = 1800
 [truststore]
-location = <location of truststore her eg keystore/MyTrustore> 
-password = <base64 encode your truststore password here>
+location = keystore/myTrustStore
+password = < enter base64 password to trustStore here >
 [activity]
-idle_time = 300
-loops = 10
+loop_idle_time = 10
+loops = 2
+[test-alldatabases]
+enable = true
+publishers = 1
+subscribers_per_publisher = 1
+[test-allcollections]
+enable = true
+publishers = 1
+subscribers_per_publisher = 1
 database = ibmclouddb
-collection = test
