@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

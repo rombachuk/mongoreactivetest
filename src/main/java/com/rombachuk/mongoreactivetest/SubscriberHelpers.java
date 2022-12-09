@@ -252,8 +252,17 @@ public final class SubscriberHelpers {
         /**
          * Construct a new instance
          */
-        public LogDocumentSubscriber(String prefix) {
-            super(t -> logger.info(prefix+t.toJson()));
+        private String prefix;
+
+        public LogDocumentSubscriber(String prefix) {        
+            super(t -> logger.info(prefix+t.toJson()));      
+            this.prefix = prefix;  
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            logger.info(prefix+" Error : "+t.toString());
+            super.onError(t);
         }
     }
 
@@ -278,8 +287,17 @@ public final class SubscriberHelpers {
         /**
          * Construct a new instance
          */
-        public LogToStringSubscriber(String prefix) {
+        private String prefix;
+
+        public LogToStringSubscriber(String prefix) {          
             super(t -> logger.info(prefix+t.toString()));
+            this.prefix = prefix;
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            logger.info(prefix+" Error : "+t.toString());
+            super.onError(t);
         }
     }
 
@@ -304,6 +322,7 @@ public final class SubscriberHelpers {
             super.onNext(document);
             consumer.accept(document);
         }
+
     }
 
     private SubscriberHelpers() {

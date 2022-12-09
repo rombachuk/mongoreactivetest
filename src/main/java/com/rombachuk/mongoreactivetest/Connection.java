@@ -15,6 +15,16 @@ public class Connection {
 
     MongoClient mongoClient = null;
 
+    private int getSetting ( Configuration configuration, String key, int defaultvalue) {
+
+        int setting = defaultvalue;
+        if (configuration.map.get("connectionpool").containsKey(key)) {
+            setting = Integer.parseInt(configuration.map.get("connectionpool").get(key).toString());
+        }
+        return setting;
+    }
+
+
     private String ConnectionStringBuilder(Configuration configuration) {
 
         String connectionString = null;
@@ -52,13 +62,14 @@ public class Connection {
 
         try {
 
-            Integer maxconnectionidletime = Integer.parseInt(configuration.map.get("connectionpool").get("maxconnectionidletime").toString());
+            final int maxconnectionidletime = getSetting(configuration,"maxconnectionidletime",0);
+            final int maxsize = getSetting(configuration,"maxsize",100);
             
             this.mongoClient = MongoClients.create(
             MongoClientSettings.builder()
             .applyConnectionString(new ConnectionString(ConnectionStringBuilder(configuration)))
             .applyToSslSettings(builder ->builder.enabled(true).invalidHostNameAllowed(true))
-            .applyToConnectionPoolSettings(builder -> builder.maxConnectionIdleTime(maxconnectionidletime, TimeUnit.SECONDS))
+            .applyToConnectionPoolSettings(builder -> builder.maxConnectionIdleTime(maxconnectionidletime, TimeUnit.SECONDS).maxSize(maxsize))
             .build());                                                       
         }
         finally {
