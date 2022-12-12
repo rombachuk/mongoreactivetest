@@ -59,24 +59,30 @@ public final class App {
         logger.info("test-allcollections enabled="+testallcollections.getEnabled());
 
         for (Integer i = 0; i < loops; i++) {      
-              
+            try { 
+                
             if (testalldatabases.getEnabled()) {
                 testalldatabases.run(i);
             }
             if (testallcollections.getEnabled()) {
                 testallcollections.run(i);
             }
-
-            try {
                 logger.info("Loop ["+i+"] Sleeping for ["+loop_idle_time+"] seconds...");
                 TimeUnit.SECONDS.sleep(loop_idle_time);
+                
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
+                logger.info("Interrupted Exception");
+                e.printStackTrace();
+            }
+            catch (com.mongodb.MongoInterruptedException e) {
+                // TODO Auto-generated catch block
+                logger.info("Interrupted Exception");
                 e.printStackTrace();
             }
 
         }
-
+    
         connection.mongoClient.close();
 
         logger.info("Completed activity");

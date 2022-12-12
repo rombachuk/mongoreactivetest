@@ -186,7 +186,7 @@ public final class SubscriberHelpers {
                     throw new MongoTimeoutException("Publisher onComplete timed out");
                 }
             } catch (InterruptedException e) {
-                throw new MongoInterruptedException("Interrupted waiting for observeration", e);
+                throw new MongoInterruptedException("Interrupted waiting for observation", e);
             }
             if (!errors.isEmpty()) {
                 throw errors.get(0);
@@ -260,9 +260,9 @@ public final class SubscriberHelpers {
         }
 
         @Override
-        public void onError(Throwable t) {
-            logger.info(prefix+" Error : "+t.toString());
+        public void onError(Throwable t) {  
             super.onError(t);
+            logger.info(prefix+" Error : "+t.toString());
         }
     }
 
@@ -296,8 +296,8 @@ public final class SubscriberHelpers {
 
         @Override
         public void onError(Throwable t) {
-            logger.info(prefix+" Error : "+t.toString());
             super.onError(t);
+            logger.info(prefix+" Error : "+t.toString());
         }
     }
 
