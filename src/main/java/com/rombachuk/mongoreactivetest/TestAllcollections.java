@@ -35,29 +35,44 @@ public class TestAllcollections {
         return result;
     }    
 
+    private String formatInt (int num, int max) {  
+        if (max >= 10000) {
+            return String.format("%05d",num);
+        }  else if (max >= 1000) {
+            return String.format("%04d",num);
+        }  else if (max >= 100) {
+            return String.format("%03d",num);
+        }  else {
+            return String.format("%02d",num);
+        }
+    }
+
 
     public  TestAllcollections (Map<String, String> configuration, Connection connection) {
-        this.configuration = configuration;
+       
         List<String> expected = Arrays.asList("enable", "publishers", "subscribers_per_publisher","database");
         if (valid_configuration (configuration,expected)) {
                     enabled = true;
-                    Integer num_publishers =  Integer.parseInt(configuration.get("publishers").toString());
+                    int num_publishers =  Integer.parseInt(configuration.get("publishers").toString());
                     String testdatabase =  configuration.get("database").toString();
-                    for (Integer i = 0; i < num_publishers; i++) {
+                    for (int i = 0; i < num_publishers; i++) {
                         publishers.add(connection.mongoClient.getDatabase(testdatabase));
                     }
         }
+        this.configuration = configuration;
     }
 
     public  void run (Integer loop) {
 
-        Integer subs_per_pub =  Integer.parseInt(this.configuration.get("subscribers_per_publisher").toString());
+        int num_publishers =  Integer.parseInt(configuration.get("publishers").toString());
+        int subs_per_pub =  Integer.parseInt(this.configuration.get("subscribers_per_publisher").toString());
 
-        Integer pindex = 0;
+        int pindex = 0;
         for (MongoDatabase publisher : this.publishers) {
-            Integer sindex = 0;
-            for (Integer j=0; j < subs_per_pub; j++) {
-            String logprefix = "Loop ["+loop.toString()+"] allcollections Pubsub [" + pindex.toString() + "/"+ sindex.toString()+"] ";
+            int sindex = 0;
+            for (int j=0; j < subs_per_pub; j++) {
+            String logprefix = "Loop ["+loop.toString()+"] allcollections Pubsub [" + loop.toString()+"/"+ formatInt(pindex, num_publishers) + 
+            "/"+ formatInt(sindex, subs_per_pub)+"] ";
             publisher.listCollectionNames().subscribe(new SubscriberHelpers.LogToStringSubscriber<String>(logprefix)); 
             sindex = sindex + 1;
             }

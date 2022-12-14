@@ -36,6 +36,18 @@ public class TestAlldatabases {
         return result;
     }       
 
+    private String formatInt (int num, int max) {  
+        if (max >= 10000) {
+            return String.format("%05d",num);
+        }  else if (max >= 1000) {
+            return String.format("%04d",num);
+        }  else if (max >= 100) {
+            return String.format("%03d",num);
+        }  else {
+            return String.format("%02d",num);
+        }
+    } 
+
     public  TestAlldatabases (Map<String, String> configuration, Connection connection) {
 
         List<String> expected = Arrays.asList("enable", "publishers", "subscribers_per_publisher");
@@ -52,13 +64,15 @@ public class TestAlldatabases {
 
     public  void run (Integer loop) {
 
+        Integer num_publishers =  Integer.parseInt(configuration.get("publishers").toString());
         Integer subs_per_pub =  Integer.parseInt(this.configuration.get("subscribers_per_publisher").toString());
 
         Integer pindex = 0;
         for (ListDatabasesPublisher<Document> publisher : this.publishers) {
             Integer sindex = 0;
             for (Integer j=0; j < subs_per_pub; j++) {
-            String logprefix = "Loop ["+loop.toString()+"] alldatabases Pubsub [" + pindex.toString() + "/"+ sindex.toString()+"] ";
+                String logprefix = "Loop ["+loop.toString()+"] alldatabases Pubsub [" + loop.toString()+"/"+ formatInt(pindex, num_publishers) + 
+                "/"+ formatInt(sindex, subs_per_pub)+"] ";
             publisher.subscribe(new SubscriberHelpers.LogDocumentSubscriber(logprefix)); 
             sindex = sindex + 1;
             }

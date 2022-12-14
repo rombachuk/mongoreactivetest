@@ -51,6 +51,7 @@ public final class App {
         logger.info("Making connection");
 
         final Connection connection = new Connection(configuration);
+        final int poolaccesstimeout = connection.getPoolaccesstimeout();
         final TestAlldatabases testalldatabases = new TestAlldatabases(configuration.map.get("test-alldatabases"), connection);
         final TestAllcollections testallcollections = new TestAllcollections(configuration.map.get("test-allcollections"), connection);
 
@@ -82,7 +83,18 @@ public final class App {
             }
 
         }
-    
+
+        if (loop_idle_time <= poolaccesstimeout) {
+            try {
+                logger.info("Loop-time < pool-access-timeout of ["+
+                             Integer.toString(poolaccesstimeout)+"s]: Running final wait to allow async pool to timeout");
+                TimeUnit.SECONDS.sleep(poolaccesstimeout);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                logger.info("Interrupted Exception during sleep");
+                e.printStackTrace();
+            }           
+        }
         connection.mongoClient.close();
 
         logger.info("Completed activity");

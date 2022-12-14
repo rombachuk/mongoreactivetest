@@ -14,6 +14,11 @@ import com.mongodb.reactivestreams.client.MongoClients;
 public class Connection {
 
     MongoClient mongoClient = null;
+    private int poolaccesstimeout = 120;
+
+    public int getPoolaccesstimeout () {
+        return this.poolaccesstimeout;
+    }
 
     private int getSetting ( Configuration configuration, String key, int defaultvalue) {
 
@@ -64,12 +69,22 @@ public class Connection {
 
             final int maxconnectionidletime = getSetting(configuration,"maxconnectionidletime",0);
             final int maxsize = getSetting(configuration,"maxsize",100);
+            final int maxwaittime = getSetting(configuration,"maxwaittime",120);
+            this.poolaccesstimeout = maxwaittime;
             
             this.mongoClient = MongoClients.create(
             MongoClientSettings.builder()
             .applyConnectionString(new ConnectionString(ConnectionStringBuilder(configuration)))
-            .applyToSslSettings(builder ->builder.enabled(true).invalidHostNameAllowed(true))
-            .applyToConnectionPoolSettings(builder -> builder.maxConnectionIdleTime(maxconnectionidletime, TimeUnit.SECONDS).maxSize(maxsize))
+            .applyToSslSettings(builder ->
+            builder.enabled(true).
+            invalidHostNameAllowed(true)
+            )
+            .applyToConnectionPoolSettings(builder -> 
+            builder.maxConnectionIdleTime(maxconnectionidletime, TimeUnit.SECONDS)
+            .maxSize(maxsize)
+            .maxWaitTime(maxwaittime, TimeUnit.SECONDS)
+            .addConnectionPoolListener(new CustomConnectionPoolListener())
+            )
             .build());                                                       
         }
         finally {
